@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package cc.bandaotixi.plugins;
 
 import java.util.List;
 
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
@@ -45,6 +46,17 @@ public class OneToManyPlugin extends PluginAdapter {
 			}
 		}
 		return tc;
+	}
+	private IntrospectedTable getIt(String tableName,Context context){
+		
+		for(IntrospectedTable i:context.getIntrospectedTables()){
+			i.calculateJavaClientAttributes();
+			i.calculateXmlAttributes();
+			if(i.getTableConfiguration().getTableName().equalsIgnoreCase(tableName)){
+				return i;
+			}
+		}
+		return null;
 	}
 	private String getModelPackage( IntrospectedTable introspectedTable,Context context){
 		StringBuilder sb = new StringBuilder();
@@ -87,7 +99,7 @@ public class OneToManyPlugin extends PluginAdapter {
 				// set
 				Method setMethod = new Method();
 				setMethod.setVisibility(JavaVisibility.PUBLIC);
-				setMethod.setName("set" + introspectedTable.getTableConfiguration().getDomainObjectName() + "s");
+				setMethod.setName("set" + tc.getDomainObjectName() + "s");
 				setMethod.addParameter(new Parameter(fqjt, fieldName));
 				setMethod.addBodyLine("this." + fieldName + "=" + fieldName + ";");
 				topLevelClass.addMethod(setMethod);
@@ -124,6 +136,7 @@ public class OneToManyPlugin extends PluginAdapter {
 		for (OneToMany otm : introspectedTable.getOneToManys()) {
 			String tableName = otm.getMappingTable();
 			TableConfiguration tc =getMapTc(tableName, context);
+			IntrospectedTable it=getIt(tableName, context);
 			if (tc != null) {
 				String domainName = tc.getDomainObjectName()+"s";
 				String fieldName = domainName.replaceFirst(new String(new char[] { domainName.charAt(0) }), new String(new char[] { domainName.charAt(0) }).toLowerCase());
@@ -158,11 +171,13 @@ public class OneToManyPlugin extends PluginAdapter {
 				//添加查询方法<select id="testOutMapper" resultMap="soc.dao.ScanDao.BaseResultMap"><include refid="soc.dao.ScanDao.Base_Column_List" />
 				XmlElement selectEle=new XmlElement("select");
 				selectEle.addAttribute(new Attribute("id", "get"+domainName));
-				selectEle.addAttribute(new Attribute("resultMap", introspectedTable.getMyBatis3SqlMapNamespace()+"."+"BaseResultMap"));
-				String sql="select <include refid=\""
-						+introspectedTable.getMyBatis3SqlMapNamespace()
-						+".Base_Column_List\" /> from "
-						+tableName+" where "+otm.getJoinColumn()+"=#{"+tuofengColum+"} ";
+				selectEle.addAttribute(new Attribute("resultMap", it.getMyBatis3SqlMapNamespace()+"."+"BaseResultMap"));
+				String sql="select ";
+				for(IntrospectedColumn c:it.getAllColumns()){
+					sql+=c.getActualColumnName()+",";
+				}
+				sql=sql.substring(0, sql.length()-1);
+				sql+=" from " +tableName+" where "+otm.getJoinColumn()+"=#{"+tuofengColum+"} ";
 				if(StringUtility.stringHasValue(otm.getWhere())){
 					sql+=" and "+otm.getWhere();
 				}

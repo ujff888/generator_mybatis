@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -777,7 +777,7 @@ public abstract class IntrospectedTable {
     /**
      * Calculate xml attributes.
      */
-    protected void calculateXmlAttributes() {
+    public void calculateXmlAttributes() {
         setIbatis2SqlMapPackage(calculateSqlMapPackage());
         setIbatis2SqlMapFileName(calculateIbatis2SqlMapFileName());
         setMyBatis3XmlMapperFileName(calculateMyBatis3XmlMapperFileName());
@@ -1319,7 +1319,7 @@ public abstract class IntrospectedTable {
     /**
      * Calculate java client attributes.
      */
-    protected void calculateJavaClientAttributes() {
+    public void calculateJavaClientAttributes() {
         if (context.getJavaClientGeneratorConfiguration() == null) {
             return;
         }

@@ -1,5 +1,5 @@
 /**
- *    Copyright ${license.git.copyrightYears} the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class ShellRunner {
 
     public static void main(String[] args) {
     	//-configfile generatorConfig.xml -overwrite
-//    	String configFile="C:\\Users\\zengxiaowei\\Desktop\\core\\mybatis-generator-core\\src\\main\\resources\\mbtgen-cfg.xml";
+//    	String configFile="C:\\Users\\zengxiaowei\\git\\generator_mybatis\\mybatis-generator-core\\src\\main\\resources\\generatorConfig.xml";
 //    	args=new String[]{"-configfile",configFile,"-overwrite"};
         if (args.length == 0) {
             usage();
